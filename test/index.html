@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TESTING CLIENT</title>
+	<style>
+		table {
+			border-collapse: collapse;
+		}
+		th, td {
+			border: 1px solid black;
+			padding: 10px;
+		}
+		table, div, button {
+			margin: 1rem 0;
+		}
+	</style>
+</head>
+<body>
+
+<h1>testing client</h1>
+
+<button id="leave-button">leave room</button>
+<button id="join-button">join room</button>
+<div id="message-div"></div>
+
+<table>
+	<thead>
+		<tr>
+			<th>Train</th>
+			<th>Departure Time</th>
+			<th>Arrival Time</th>
+			<th>Delay</th>
+		</tr>
+	</thead>
+	<tbody id="train-table"></tbody>
+</table>
+
+<script type="module" src="client.js"></script>
+
+</body>
+</html>

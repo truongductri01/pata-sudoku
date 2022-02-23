@@ -1,11 +1,16 @@
+// using sockets with express requires sending server to io.
 const express = require("express");
 const app = express();
+// setting up the requirements for io to work
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 const {connect, 
   createRoomTable, addRoomQuery, 
   addUserQuery, createUserTable, 
   createBoardTable, addBoardQuery, 
   createGameTable, addGameQuery} = require("./create_test_data.js");
-app.use(express.static("build"));
+// for testing the sockets and database this has been changed from build to test
+  app.use(express.static("../test"));
 
 async function userTableTests() {
     createUserTable().then(() => {
@@ -63,20 +68,47 @@ async function gameTableTests() {
     );
 }
 
-
 connect().then(
     () => {
-        roomTableTests();
-        userTableTests();
-        boardTableTests();
-        gameTableTests();
+        // roomTableTests();
+        // userTableTests();
+        // boardTableTests();
+        // gameTableTests();
+        console.log("test database connected");
     });
 
 
 const PORT = 3000;
 
+// Websockets (socket.io) 
+// 2 players per room, join socket, leave socket, brodcast socket status, remove room. 
+// Three states: waiting, playing, finished (winner, draw).
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+    socket.on('join', (roomId) => {
+        socket.join(roomId);
+        console.log(`user joined room ${roomId}`);
+    });
+    socket.on('leave', (roomId) => {
+        socket.leave(roomId);
+        console.log(`user left room ${roomId}`);
+    });
+    socket.on('status', (status) => {
+        console.log(`user status in room ${status}`);
+    });
+    socket.on('remove', (roomId) => {
+        console.log(`user removed room ${roomId}`);
+    });
+    socket.on('message', (roomId, message) => {
+        console.log(`user sent message ${message} in room ${roomId}`);
+    });
+});
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Listenning to ${PORT}`);
 });
