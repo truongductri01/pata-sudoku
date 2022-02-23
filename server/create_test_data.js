@@ -73,7 +73,7 @@ async function addGameQuery(startTime, endTime, boardId, playersIds, winnerId){
 
 async function addUserQuery(name, email, gamesId, salt, username, hash){
     return pool.query(`INSERT INTO userInfo (name, email, gamesId, salt, username, hash) 
-    VALUES ($1, $2, $3, $4, $5, $6)`, 
+    VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
     [name, email, gamesId, salt, username, hash]);
 }
 
@@ -83,11 +83,16 @@ async function addRoomQuery(capacity, gameId, isHidden, canWitness, userIds){
     [capacity, gameId, isHidden, canWitness, userIds]);
 }
 
+// Users function
+async function hasUserWithUsername(username) { 
+    return pool.query(`SELECT * from userinfo WHERE username=$1`, [username]);
+}
+
 const testDataFunctions =  {
     createRoomTable, 
     addRoomQuery, connect, 
     addUserQuery, createUserTable, 
     createGameTable, createBoardTable, 
-    addBoardQuery, addGameQuery};
+    addBoardQuery, addGameQuery, hasUserWithUsername};
 
 module.exports = testDataFunctions;
