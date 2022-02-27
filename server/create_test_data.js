@@ -88,11 +88,16 @@ async function hasUserWithUsername(username) {
     return pool.query(`SELECT * from userinfo WHERE username=$1`, [username]);
 }
 
+// Game function
+async function getGameWithId(gameId) { 
+    return pool.query(`SELECT * from game WHERE id=$1`, [gameId]);
+} 
+
 const testDataFunctions =  {
     createRoomTable, 
     addRoomQuery, connect, 
     addUserQuery, createUserTable, 
     createGameTable, createBoardTable, 
-    addBoardQuery, addGameQuery, hasUserWithUsername};
+    addBoardQuery, addGameQuery, hasUserWithUsername, getGameWithId};
 
 module.exports = testDataFunctions;
