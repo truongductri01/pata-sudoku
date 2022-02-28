@@ -3,6 +3,7 @@ const axios = require("axios");
 const router = express.Router();
 
 // Code using Sudoku api from: https://github.com/bertoort/sugoku
+const SudokuApiBase = "https://sugoku.herokuapp.com";
 
 const encodeBoard = (board) =>
   board.reduce(
@@ -17,6 +18,21 @@ const encodeParams = (params) =>
     .map((key) => key + "=" + `%5B${encodeBoard(params[key])}%5D`)
     .join("&");
 
+router.get("/generate", async (req, res) => {
+  const { difficulty } = req.query;
+  if (difficulty && ["easy", "medium", "hard", "random"].includes(difficulty)) {
+    const board = await axios
+      .get(`${SudokuApiBase}/board?difficulty=${difficulty}`)
+      .then((res) => res.data.board);
+    console.log(board);
+    res.json(board);
+  } else {
+    res
+      .status(400)
+      .send("Missing Desire Difficultiy or difficulty is not a valid option");
+  }
+});
+
 router.get("/solve", async (req, res) => {
   const board = req.body.board;
   if (board) {
@@ -25,7 +41,7 @@ router.get("/solve", async (req, res) => {
     };
 
     await axios
-      .post("https://sugoku.herokuapp.com/solve", encodeParams(data), {
+      .post(`${SudokuApiBase}/solve`, encodeParams(data), {
         "Content-Type": "application/x-www-form-urlencoded",
       })
 
@@ -44,7 +60,7 @@ router.get("/validate", async (req, res) => {
     };
 
     await axios
-      .post("https://sugoku.herokuapp.com/validate", encodeParams(data), {
+      .post(`${SudokuApiBase}/validate`, encodeParams(data), {
         "Content-Type": "application/x-www-form-urlencoded",
       })
       .then((response) => {
