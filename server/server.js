@@ -20,7 +20,7 @@ app.use(`${apiRootPath}/user`, userRoutes);
 app.use(`${apiRootPath}/games`, gameRoutes);
 app.use(`${apiRootPath}/board`, boardRoutes);
 app.use(`${apiRootPath}/rooms`, roomRoutes);
-const PORT = 3000;
+const PORT = 8080; // avoid collapse with client
 
 app.listen(PORT, () => {
   console.log(`Listenning to ${PORT}`);

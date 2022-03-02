@@ -9,8 +9,8 @@ const {
   removeUserIdFromRoom,
   getRoomData,
   getGameWithId,
-  parseRoomData,
 } = require("../create_test_data");
+const { parseRoomData } = require("../utils/dataParsing");
 const router = express.Router();
 
 router.post("/create", (req, res) => {
