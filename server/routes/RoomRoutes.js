@@ -6,6 +6,8 @@ const {
   isRoomFull,
   addUserIdToRoom,
   hasUserInRoom,
+  removeUserIdFromRoom,
+  getRoomData,
 } = require("../create_test_data");
 const router = express.Router();
 
@@ -29,6 +31,22 @@ router.post("/create", (req, res) => {
   }
 });
 
+router.get("/:roomId", async (req, res) => {
+  const { roomId } = req.params;
+  if (roomId) {
+    const validRoom = await isRoomExist(roomId);
+    if (validRoom) {
+      getRoomData(roomId)
+        .then((data) => res.json(data))
+        .catch((e) => res.status(500).send(e));
+    } else {
+      res.status(404).send("Not valid room");
+    }
+  } else {
+    res.status(400).send("Missing roomId");
+  }
+});
+
 router.post("/userjoin/:roomId", async (req, res) => {
   const { userId } = req.body; // need userId
   const roomId = req.params.roomId;
@@ -44,8 +62,9 @@ router.post("/userjoin/:roomId", async (req, res) => {
         if (userInRoom) {
           res.send("User already in room");
         } else {
-          addUserIdToRoom(roomId, userId);
-          res.send("Success");
+          addUserIdToRoom(roomId, userId)
+            .then(() => res.send("Success"))
+            .catch((e) => res.status(500).send(e));
         }
       }
     } else {
@@ -57,6 +76,30 @@ router.post("/userjoin/:roomId", async (req, res) => {
     }
   } else {
     res.status(400).send("Missing user Id");
+  }
+});
+
+router.post("/userleave/:roomId", async (req, res) => {
+  const { roomId } = req.params;
+  const { userId } = req.body;
+  if (roomId && userId) {
+    const validRoom = await isRoomExist(roomId);
+    const validUser = await isValidUserId(userId);
+    if (validRoom && validUser) {
+      const userInRoom = await hasUserInRoom(roomId, userId);
+      if (userInRoom) {
+        // remove
+        removeUserIdFromRoom(roomId, userId)
+          .then(() => res.send("Success"))
+          .catch((e) => res.status(500).send(e));
+      } else {
+        res.status(400).send("User not in room");
+      }
+    } else {
+      res.status(404).send("Either room or user not exist");
+    }
+  } else {
+    res.status(400).send("Missing either roomId or userId");
   }
 });
 

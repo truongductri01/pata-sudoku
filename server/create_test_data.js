@@ -94,6 +94,10 @@ async function addRoomQuery(capacity, gameId, isHidden, canWitness, userIds) {
 
 // Users function
 async function isValidUserId(userId) {
+  // as in database, id is integer
+  if (isNaN(userId) || parseInt(userId) != parseFloat(userId)) {
+    return false;
+  }
   return pool
     .query(`SELECT * FROM userinfo WHERE id=$1`, [userId])
     .then((res) => res.rowCount === 1);
@@ -132,11 +136,24 @@ async function hasUserInRoom(roomId, userId) {
 async function addUserIdToRoom(roomId, userId) {
   const room = await getRoomData(roomId);
   const userIds = room["userids"];
-  console.log("User ids >>>", userIds);
   userIds.push(userId);
 
   return pool.query(`UPDATE room SET userids=$1 WHERE id=$2`, [
     userIds,
+    roomId,
+  ]);
+}
+async function removeUserIdFromRoom(roomId, userId) {
+  const room = await getRoomData(roomId);
+  const userIds = room["userids"];
+  const newUserIds = [];
+  userIds.forEach((id) => {
+    if (id !== userId.toString()) {
+      newUserIds.push(id);
+    }
+  });
+  return pool.query(`UPDATE room SET userids=$1 WHERE id=$2`, [
+    newUserIds,
     roomId,
   ]);
 }
@@ -154,10 +171,12 @@ const testDataFunctions = {
   hasUserWithUsername,
   getGameWithId,
   // Room functions
+  addUserIdToRoom,
+  getRoomData,
+  hasUserInRoom,
   isRoomExist,
   isRoomFull,
-  addUserIdToRoom,
-  hasUserInRoom,
+  removeUserIdFromRoom,
   // User functions
   isValidUserId,
 };
