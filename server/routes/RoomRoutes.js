@@ -8,6 +8,8 @@ const {
   hasUserInRoom,
   removeUserIdFromRoom,
   getRoomData,
+  getGameWithId,
+  parseRoomData,
 } = require("../create_test_data");
 const router = express.Router();
 
@@ -37,7 +39,11 @@ router.get("/:roomId", async (req, res) => {
     const validRoom = await isRoomExist(roomId);
     if (validRoom) {
       getRoomData(roomId)
-        .then((data) => res.json(data))
+        .then((data) => {
+          getGameWithId(data["gameid"])
+            .then((poolRes) => res.json(parseRoomData(data, poolRes.rows[0])))
+            .catch((e) => res.status(500).send(e));
+        })
         .catch((e) => res.status(500).send(e));
     } else {
       res.status(404).send("Not valid room");

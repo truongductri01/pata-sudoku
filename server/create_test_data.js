@@ -158,6 +158,33 @@ async function removeUserIdFromRoom(roomId, userId) {
   ]);
 }
 
+// parsing function
+function parseGameData(gameData) {
+  const parsedGameData = {
+    startTime: gameData["starttime"],
+    endTime: gameData["endtime"],
+    boardId: gameData["boardid"],
+    playersIds: gameData["playersids"],
+    winnerId: gameData["winnerId"],
+    id: gameData["id"],
+  };
+  return parsedGameData;
+}
+function parseRoomData(roomData, gameData = null) {
+  const parsedRoomData = {
+    id: roomData["id"],
+    capacity: roomData["capacity"],
+    gameId: roomData["gameid"],
+    isHidden: roomData["ishidden"],
+    canWitness: roomData["canwitness"],
+    userIds: roomData["userids"],
+  };
+  if (gameData) {
+    return { ...parsedRoomData, ...parseGameData(gameData) };
+  }
+  return parsedRoomData;
+}
+
 const testDataFunctions = {
   createRoomTable,
   addRoomQuery,
@@ -179,6 +206,9 @@ const testDataFunctions = {
   removeUserIdFromRoom,
   // User functions
   isValidUserId,
+  // parse data functions
+  parseGameData,
+  parseRoomData,
 };
 
 module.exports = testDataFunctions;
