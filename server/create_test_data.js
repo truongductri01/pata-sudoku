@@ -116,6 +116,12 @@ async function getRoomData(roomId) {
     .query(`SELECT * FROM room WHERE id=$1`, [roomId])
     .then((res) => (res.rowCount === 1 ? res.rows[0] : {}));
 }
+
+async function getUserList(roomId) {
+  const room = await getRoomData(roomId);
+  return room["userids"];
+}
+
 async function isRoomExist(roomId) {
   const room = await getRoomData(roomId);
   return Object.keys(room).length > 0;
@@ -203,6 +209,7 @@ const testDataFunctions = {
   isRoomExist,
   isRoomFull,
   removeUserIdFromRoom,
+  getUserList,
   // User functions
   isValidUserId,
   // parse data functions
