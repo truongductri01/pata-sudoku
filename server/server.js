@@ -46,8 +46,8 @@ io.on('connection', (socket) => {
         console.log(rooms);
         if (rooms.length === 2) {
             // if the user is in a room, then leave the room.
-            socket.leave(rooms[1]);
-            socket.to(rooms[1]).emit("message", `${socket.id} has left the room`);   
+            socket.leave("room"+rooms[1]);
+            socket.to("room"+rooms[1]).emit("message", `${socket.id} has left the room`);   
         }
     });
     socket.on('disconnect', () => {
@@ -88,7 +88,7 @@ io.on('connection', (socket) => {
             io.to("room" + roomId).emit('usrlist', await getUserList(roomId));
             await isRoomFull(roomId).then( async (isFull) => {
                 if (isFull) {
-                    const board = await generateBoard("hard");
+                    const board = await generateBoard("easy");
                     console.log(board);
                     io.to("room" + roomId).emit('board', board);
                     io.to("room"+roomId).emit("gameStart", `game start`);
