@@ -60,7 +60,6 @@ function Getter(props){
     ).then((res)=>{
       return res.json();
     }).then((data)=>{
-      //console.log(data.board)
       props.doBoard(data.board)});
   },[]);
 
@@ -81,41 +80,49 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      origin : Array(81).fill(null),
-      squares : Array(81).fill(null),
-      win: false,
+      origin :props.origin,
+      squares :props.squares,
+      win: props.win,
     }
+    this.origin = props.origin;
+    this.square = props.squares;
+    this.setOrigin = props.setOrigin;
+    this.setSquare = props.setSquares;
+    this.setWin = props.setWin;
   }
+
   KeyPress(event,i){
     if (this.state.origin[i] == 0) {
       if (event.nativeEvent.charCode > 47 && event.nativeEvent.charCode < 58) {
         let cur = this.state.squares;
         cur[i] = parseInt(event.key);
-        this.setState({squares: cur})
+        this.setSquare(cur);
       }
     }
 
   }
-  doBoard(data){
-    let res=Array(81).fill(null);
-    let res2=Array(81).fill(null);
-    for (let i = 0; i < 9; i++){
-      for (let j = 0; j < 9; j++){
-        res[i*9 +j] = data[j][i] == 0 ? 0: data[j][i];
-        res2[i*9 +j] = data[j][i];
+  doBoard(data) {
+    let res = Array(81).fill(null);
+    let res2 = Array(81).fill(null);
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        res[i * 9 + j] = data[j][i] == 0 ? 0 : data[j][i];
+        res2[i * 9 + j] = data[j][i];
       }
     }
-    this.setState({squares: res, origin : res2});
+    this.setSquare(res);
+    this.setOrigin(res2);
   }
 
-  validate(sol){
-    if(this.state.current === sol){
+
+  validate(sol,board){
+    if(board === sol){
       console.log("YOU WIN");
-      this.setState({win:true});
+      this.setWin(true)
     }
+
     else{
       console.log("Try Again");
-      return false;
     }
   }
 
@@ -145,14 +152,16 @@ class Game extends React.Component {
         .then(response => response.json())
         .then(response => {
           console.log(response.solution);
-          this.validate(response.solution);
+          this.validate(response.solution,board);
         })
         .catch(console.warn)
-    this.setState({squares : hold});
-}
+    this.setSquare(hold);
+  }
+
 
   render() {
     const squares = this.state.squares;
+    console.log(squares);
     let status = this.state.win ? 'Correct' :'Not yet correct' ;
 
     return (
