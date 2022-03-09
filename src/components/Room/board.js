@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import "./Room.css"
+import "./board.css"
 
 function Square(props) {
   return (
@@ -77,12 +77,13 @@ function Submit(props){
   )
 }
 
-class Room extends React.Component {
+class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       origin : Array(81).fill(null),
       squares : Array(81).fill(null),
+      win: false,
     }
   }
   KeyPress(event,i){
@@ -110,15 +111,17 @@ class Room extends React.Component {
   validate(sol){
     if(this.state.current === sol){
       console.log("YOU WIN");
+      this.setState({win:true});
     }
     else{
       console.log("Try Again");
+      return false;
     }
   }
 
   checkWin(){
-
     let board = [];
+    let hold = JSON.parse(JSON.stringify( this.state.squares));
     while(this.state.squares.length) board.push(this.state.squares.splice(0,9));
 
     for (let row in board){
@@ -126,7 +129,6 @@ class Room extends React.Component {
         board[row][column] = board[row][column]=== null ? 0 :board[row][column];
       }
     }
-    console.log(board)
     const encodeBoard = (board) => board.reduce((result, row, i) => result + `%5B${encodeURIComponent(row)}%5D${i === board.length -1 ? '' : '%2C'}`, '')
 
     const encodeParams = (params) =>
@@ -135,20 +137,24 @@ class Room extends React.Component {
             .join('&');
 
     const data = {board}
-    console.log(encodeParams(board));
-
     fetch('https://sugoku.herokuapp.com/solve', {
       method: 'POST',
       body: encodeParams(data),
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
         .then(response => response.json())
-        .then(response => {console.log(response.solution); this.validate(response.solution)})
+        .then(response => {
+          console.log(response.solution);
+          this.validate(response.solution);
+        })
         .catch(console.warn)
-  }
+    this.setState({squares : hold});
+}
 
   render() {
     const squares = this.state.squares;
+    let status = this.state.win ? 'Correct' :'Not yet correct' ;
+
     return (
         <div className="page">
           <div className="game">
@@ -160,6 +166,7 @@ class Room extends React.Component {
               <Getter
                  doBoard = {(data)=>this.doBoard(data)}
               />
+              <div>{status}</div>
             </div>
           </div>
           <Submit
@@ -171,4 +178,4 @@ class Room extends React.Component {
 }
 
 
-export default Room;
+export default Game;
