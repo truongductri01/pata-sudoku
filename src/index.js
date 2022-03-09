@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Container from "./Container";
 import Login from "./components/Login/Login";
 import SignUp from "./components/SignUp/SignUp";
+import Room from "./components/Room/room"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,7 +16,10 @@ ReactDOM.render(
         <Route path="" element={<Container />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignUp />} />
-          <Route path="/" element={<App />}></Route>
+          <Route path="/" element={<App />}>
+              <Route path="room" element={<Room/>}></Route>
+              "/:roomId"
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
