@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import "./main.css"
 import { useNavigate } from "react-router-dom";
 
@@ -9,10 +8,7 @@ export default function Main(){
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        navigate("/");
-
-
-        
+        navigate(`/room/${roomid}`);
       }
     return(
        <div className="main">
@@ -25,7 +21,7 @@ export default function Main(){
                         onChange={(e) => setroomid(e.target.value)}
                         />
                     </label>                
-                    <Link to={"/Room"}><button className="join">Join Room</button></Link>
+                    <button className="join" onClick={handleSubmit}>Join Room</button>
                     </form>
 
        </div> 
