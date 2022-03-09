@@ -1,5 +1,5 @@
 const express = require("express");
-const { connect, isRoomExist, isValidUserId, hasUserInRoom, isRoomFull, addUserIdToRoom, getUserList } = require("./create_test_data");
+const { connect, isRoomExist, isValidUserId, hasUserInRoom, isRoomFull, addUserIdToRoom, getUserList, removeUserIdFromRoom } = require("./create_test_data");
 const app = express();
 const testDataRoutes = require("./routes/TestDataRoutes");
 const userRoutes = require("./routes/UserRoutes");
@@ -10,7 +10,7 @@ const apiRootPath = "/api/v1";
 
 // socket config 
 const cors = require("cors");
-const { generateBoard } = require("./utils/sudokuApi");
+const { generateBoard, validateBoard } = require("./utils/sudokuApi");
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, 
     {
@@ -97,10 +97,16 @@ io.on('connection', (socket) => {
             console.log(socket.rooms.values()); // the Set contains at least the socket ID
         });
     });
-    socket.on('leave', (roomId) => {
-        socket.to(roomId).emit('message', `${socket.id} has left the room`);
-        socket.leave(roomId);
-        console.log(`${socket.id} left room ${roomId}`);
+    socket.on('leave', (userId ,roomId) => {
+        // if room full, then send game left msg
+        if (socket.rooms.size === 2) {
+            socket.to("room"+roomId).emit("gameUsrLeft", `${userId} left`);
+            socket.leave("room"+roomId);
+        }
+        // update the database
+        removeUserIdFromRoom(roomId, userId).then( async () => {
+            console.log(`user ${userId} ${socket.id} left room ${roomId}`);
+        });
     });
     socket.on('roomMessage', (roomId, message) => {
         console.log(`user sent message ${message} in room ${roomId}`);
@@ -111,8 +117,22 @@ io.on('connection', (socket) => {
     });
     socket.on('submit', (roomId, userId, board) => { 
         console.log(`user: ${userId} submitted in room ${roomId}`);
-        io.to(roomId).emit('gameSubmitted', `${userId} has submitted`);
+        console.log(board);
+        io.to("room"+roomId).emit('gameSubmitted', `${userId} has submitted`);
+        validateBoard(board).then((data) => {
+            console.log(data.status);
+            if (data.status === "solved") {
+                // emit success
+                io.to("room"+roomId).emit('gameSubmittedGood', `${userId} has solved the game`);
+                //emit winner
+                io.to("room"+roomId).emit('winner', userId);
+            } else {
+                // emit fail
+                socket.emit('gameSubmittedBad', `${userId}, Please try again`);
+            }
+        });
     });
+
 });
 
 
