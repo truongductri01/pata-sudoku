@@ -1,21 +1,46 @@
 import React, { useState } from "react";
 import "./signup.css";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Signup() {
-  const [email, setemail] = useState("");
+  const [userid, setuserid] = useState("");
   const [password, setpassword] = useState("");
   const [confirmpassword,confirm]=useState("");
-
+  const navigate = useNavigate();
   function validateForm() {
-    return email.length > 0 && password.length > 8 && password==confirmpassword;
+    return userid.length > 0 && password.length > 8 && password==confirmpassword;
   }
 
  
 
   const handleSubmit = (event) => {
       event.preventDefault();
+      fetch("http://localhost:8080/api/v1/user/register",{
+        method:"POST",
+        headers: {"content-type":"application/json"},
+        body: JSON.stringify({
+          username: event.target[0].value,
+          password:event.target[1].value,
+          name:"Random name"
+        })
+      }).then(res => {
+        if (res.ok) {
+            res.json().then((data)=> 
+  
+            {localStorage.setItem("id",data.id);
+            localStorage.setItem("email",data.email);
+            localStorage.setItem("gamesId",data.gamesId);
+            localStorage.setItem("name",data.name);
+            navigate("/")}
+            )
+            
+        } else {
+            console.log(res);
+        }
+      })
+      
       
     }
   return(
@@ -23,11 +48,11 @@ export default function Signup() {
       <h1 className="sudoku">Register</h1>
       <div className="form">
         <form onSubmit={handleSubmit}>
-          <label style={{fontSize:"18px"}}>Email
+          <label style={{fontSize:"18px"}}>Username
             <input className="username"
-                type="email" 
-                value={email}
-                onChange={(e) => setemail(e.target.value)}
+                type="text" 
+                value={userid}
+                onChange={(e) => setuserid(e.target.value)}
                   />
                 </label>
                 <br></br>
