@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# Pata Sudoku
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## How to the run the code locally
 
-## Available Scripts
+- Run postgres and create database
+- Create a env.json file for database connection
+- Install dependency for both frontend and backend
+- Run backend
+- Send POST Request to create tables
+- Run frontend
+- Create new room locally
+- Start at http://localhost:3000/register
 
-In the project directory, you can run:
+**1. Create Database**
 
-### `npm start`
+After successfully login to postgresql on your terminal, create the database name patasql
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+CREATE DATABASE patasql;
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**2. env.json file**
 
-### `npm test`
+In the root folder, create an env.json file (same level with both src, server and public) with the following details:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```json
+{
+  "user": "postgres",
+  "host": "localhost",
+  "database": "patasql",
+  "password": "PASSWORD GO HERE",
+  "port": 5432
+}
+```
 
-### `npm run build`
+**3. Install dependency for backend**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Go inside the server folder: `cd server`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Then install dependencies: `npm install`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+And start the server: `npm start`
 
-### `npm run eject`
+**4. Send POST Request to insert table automatically**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+When the server is up and connected successfully to the database on your local machine, send a POST request to the server to insert needed tables:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+`POST http://localhost:/8080/api/v1/testdata`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The response should have a 200 status and "Success" message
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+**5. Install dependencies and run the front end**
 
-## Learn More
+On another terminal, at the root folder, run: `npm install`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Then: `npm start`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Note** When the app is compiled successfully and run, go to `http://localhost:3000/register` to register new users and start using the app like in the demo video
 
-### Code Splitting
+**6. Create Room locally**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+In postgres command, run:
 
-### Analyzing the Bundle Size
+`INSERT INTO room (capacity, gameid, ishidden, canwitness, userids) VALUES (2, 1, 'no', 'no', '{}');`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Then: `SELECT * FROM room;` to view the id of the new room created
 
-### Making a Progressive Web App
+Use that id to input on the main page to join the room after loggin in
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## More Note on using app
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Make sure the room is not full (check in database, make sure userids length is smaller than capacity)
+- Game start right away when the room is full

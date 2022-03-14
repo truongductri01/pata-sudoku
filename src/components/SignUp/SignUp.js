@@ -9,11 +9,6 @@ export default function Signup() {
   const [password, setpassword] = useState("");
   const [confirmpassword, confirm] = useState("");
   const navigate = useNavigate();
-  function validateForm() {
-    return (
-      userid.length > 0 && password.length > 8 && password == confirmpassword
-    );
-  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -79,7 +74,16 @@ export default function Signup() {
           </label>
           <br></br>
           <br></br>
-          <button className="register" disabled={!validateForm()}>
+          <button
+            className="register"
+            disabled={
+              !(
+                userid.length > 0 &&
+                password.length > 8 &&
+                password == confirmpassword
+              )
+            }
+          >
             register
           </button>
         </form>
